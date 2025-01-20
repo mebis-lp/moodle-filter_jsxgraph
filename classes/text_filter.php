@@ -244,6 +244,12 @@ class text_filter extends \filter_jsxgraph_base_text_filter {
         $this->document = null;
         $this->settings = null;
 
+        // +++ MBS-9840 (awag): add debug point for usage detection.
+        $debugmessage = "Filter called in context: {$this->context->id}. ";
+        $debugmessage .= substr($str, 0, 100);
+        \local_debugger\performance\debugger::print_debug('filter_jsxgraph', 'after_filter', $debugmessage);
+        // --- MBS-9840 (awag): add debug point for usage detection.
+
         return $str;
     }
 
