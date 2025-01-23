@@ -32,11 +32,15 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die;
+namespace filter_jsxgraph;
 
-global $PAGE, $CFG;
+defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
 require_once($CFG->libdir . '/pagelib.php');
+
+use DOMDocument;
+use moodle_url;
 
 /**
  * Class filter_jsxgraph
@@ -45,7 +49,7 @@ require_once($CFG->libdir . '/pagelib.php');
  * @copyright  2023 JSXGraph team - Center for Mobile Learning with Digital Technology – Universität Bayreuth
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class filter_jsxgraph extends moodle_text_filter {
+class text_filter extends \core_filters\text_filter {
     /**
      * Path to jsxgraphcores
      *
@@ -167,7 +171,7 @@ class filter_jsxgraph extends moodle_text_filter {
      *
      * @return String
      */
-    public function filter($text, $options = []) {
+    public function filter($text, array $options = []) {
         // To optimize speed, search for a <jsxgraph> tag (avoiding to parse everything on every text).
         if (!is_int(strpos($text, '<' . static::TAG))) {
             return $text;
@@ -237,6 +241,12 @@ class filter_jsxgraph extends moodle_text_filter {
         $this->taglist = null;
         $this->document = null;
         $this->settings = null;
+
+        // +++ MBS-9840 (awag): add debug point for usage detection.
+        $debugmessage = "Filter called in context: {$this->context->id}. ";
+        $debugmessage .= substr($str, 0, 100);
+        \local_debugger\performance\debugger::print_debug('filter_jsxgraph', 'after_filter', $debugmessage);
+        // --- MBS-9840 (awag): add debug point for usage detection.
 
         return $str;
     }
